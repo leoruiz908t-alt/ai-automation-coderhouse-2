@@ -1,0 +1,754 @@
+{
+  "name": "PreEntrega_Modulo4_Ruiz_Leopoldo_Daniel",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "id": "512c37e4-a13c-48a4-8d17-35fac70fbf53",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -48,
+        112
+      ],
+      "webhookId": "7909f6ad-9a9d-4539-9b06-2dfdf342d06b"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "ROLE:\nYou are a business inquiry classification assistant.\n\nSCOPE:\nAnalyze user messages and classify them.\n\nOBJECTIVE:\nClassify every inquiry into one of these categories:\n- Sales\n- Support\n- Billing\n\nRULES:\n- Use available tools when necessary.\n- Do not invent information.\n- If the request cannot be classified, respond with:\n\"Human review required\".\n\nESCALATION:\nIf classification confidence is low, return:\n\"Human review required\".\n\nRESTRICTIONS:\n- Do not provide legal advice.\n- Do not provide financial advice.\n- Do not modify existing records.\n[INICIO DE CONTEXTO COMPARTIDO]\n\nSession ID:\n{{ $json.sessionId }}\n\nResumen previo:\n{{ $json.Resumen_Consolidado }}\n\nEstado del caso:\n{{ $json.Estado_Caso }}\n\n[FIN DEL CONTEXTO COMPARTIDO]\n\nUtiliza esta información únicamente como contexto.",
+          "maxIterations": 5,
+          "returnIntermediateSteps": true,
+          "tracingMetadata": {
+            "values": [
+              {
+                "key": "workflow",
+                "stringValue": "Inquiry Classification Agent"
+              },
+              {
+                "key": "purpose",
+                "stringValue": "inquiry-classification"
+              }
+            ]
+          }
+        }
+      },
+      "id": "b638fb04-7d6a-4148-ab4f-dffc59cfd2e0",
+      "name": "Inquiry Classifier Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        784,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-6-luna",
+          "cachedResultName": "gpt-6-luna"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "35220502-8255-48bb-a8a4-392bb1dd61ca",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        880,
+        288
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "Gateway credits",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool only when an inquiry has been successfully classified.\n\nStore:\n- Date\n- User inquiry\n- Classification category\n\nDo not use this tool when information is insufficient or when human review is required.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps",
+          "mode": "list",
+          "cachedResultName": "N8N - Entrega  1 - Inquiry Classifications",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja 2",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "DATE": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('DATE', ``, 'string') }}",
+            "User Inquiry": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('User_Inquiry', ``, 'string') }}",
+            "Category": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Category', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "DATE",
+              "displayName": "DATE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "User Inquiry",
+              "displayName": "User Inquiry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Columna 4",
+              "displayName": "Columna 4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Columna 5",
+              "displayName": "Columna 5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Columna 6",
+              "displayName": "Columna 6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "3435b162-7908-4262-b479-7ac9182bd42d",
+      "name": "save_classified_inquiry",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1056,
+        272
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "w4rTT9mL1PKy5vj6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "timestamp",
+              "type": "string",
+              "value": "={{ $now.toISO() }}"
+            },
+            {
+              "id": "a2",
+              "name": "executionId",
+              "type": "string",
+              "value": "={{ $execution.id }}"
+            },
+            {
+              "id": "a3",
+              "name": "workflowName",
+              "type": "string",
+              "value": "={{ $workflow.name }}"
+            },
+            {
+              "id": "a4",
+              "name": "inquiry",
+              "type": "string",
+              "value": "={{ $('Chat Trigger').item.json.chatInput }}"
+            },
+            {
+              "id": "a5",
+              "name": "classification",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "id": "a6",
+              "name": "status",
+              "type": "string",
+              "value": "={{ $json.output.includes('Human review required') ? 'escalated' : 'classified' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ce4cc229-e680-4353-baee-6e16f3f66fed",
+      "name": "Log Execution Summary",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2064,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "cursitosleo@gmail.com",
+        "subject": "Reporte de Clasificación de Consulta",
+        "emailType": "text",
+        "message": "=Se procesó una nueva consulta mediante el agente de clasificación.\n\nConsulta:\n{{ $json.inquiry }}\n\nCategoría asignada:\n{{ $json.classification }}\n\nEstado:\n{{ $json.status }}\n\nFecha y hora:\n{{ $json.timestamp }}\n\nID de ejecución:\n{{ $json.executionId }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "9aded59d-3702-4fd2-ac6a-18e3aeb3d40f",
+      "name": "Send Task Completed Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2256,
+        96
+      ],
+      "webhookId": "8a9c95ad-9949-4f6f-9ed3-38308c919e31",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "i2X0w2LDF8dtu8sh",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "output",
+              "type": "string",
+              "value": "={{ $('Log Execution Summary').item.json.classification }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "92c86667-7733-4cb3-aa65-8ab3bec259cc",
+      "name": "Chat Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2464,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "1KJ3smaKdfB86vZY",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/1KJ3smaKdfB86vZY",
+          "cachedResultName": "Worker_Analisis"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Consulta": "Analizar solicitud de cliente"
+          },
+          "matchingColumns": [
+            "Consulta"
+          ],
+          "schema": [
+            {
+              "id": "Consulta",
+              "displayName": "Consulta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        1808,
+        96
+      ],
+      "id": "f9be7343-b82d-42f3-9bf7-93e9a22a7912",
+      "name": "Call 'Worker_Analisis'"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps",
+          "mode": "list",
+          "cachedResultName": "N8N - Entrega  1 - Inquiry Classifications",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1787110843,
+          "mode": "list",
+          "cachedResultName": "memoria_agente",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps/edit#gid=1787110843"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Session_ID",
+              "lookupValue": "={{$json.sessionId}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        320,
+        112
+      ],
+      "id": "c3bdd484-ff79-4072-be9d-35b14fc14b26",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "w4rTT9mL1PKy5vj6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "91b2765f-dfb1-42e8-9cae-85fd6610bc4b",
+              "leftValue": "={{$json.Session_ID}}",
+              "rightValue": "\"\"",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        512,
+        112
+      ],
+      "id": "912dc75c-2cd2-43b9-a87a-1f9d3b69adbb",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps",
+          "mode": "list",
+          "cachedResultName": "N8N - Entrega  1 - Inquiry Classifications",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1787110843,
+          "mode": "list",
+          "cachedResultName": "memoria_agente",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps/edit#gid=1787110843"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Session_ID": "={{$json.sessionId}}"
+          },
+          "matchingColumns": [
+            "Session_ID"
+          ],
+          "schema": [
+            {
+              "id": "Session_ID",
+              "displayName": "Session_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        240
+      ],
+      "id": "7290599c-3e46-4872-bb64-8bbc4cd1d340",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "w4rTT9mL1PKy5vj6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "Analiza la conversación y responde únicamente con JSON válido.\n\n{\n  \"asunto_principal\": \"string\",\n  \"puntos_clave\": [\n    \"string\"\n  ],\n  \"accion_requerida\": \"string\"\n}\n\nNo agregues explicaciones.\nNo agregues texto fuera del JSON.\nDevuelve únicamente JSON válido.\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        1072,
+        96
+      ],
+      "id": "2846cc51-fd02-4d8d-9786-63fbc9796628",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "fb20d791-5932-4abf-8dc7-d48f2f51c90d",
+              "leftValue": "={{$json.chatInput}}",
+              "rightValue": "=Auto-reply",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        112,
+        112
+      ],
+      "id": "13adc64b-f2a6-4e76-9950-4002acc8c101",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f630c857-d236-4a1a-828b-a97c8792f768",
+              "name": "from",
+              "value": "={{$json.from}}",
+              "type": "string"
+            },
+            {
+              "id": "9389354f-eac6-4e86-94f9-bfdb3d5eb5ef",
+              "name": "Subject",
+              "value": "={{$json.subject}}",
+              "type": "string"
+            },
+            {
+              "id": "b3875888-3914-45bb-936e-99a52a9bb9c1",
+              "name": "BodyText",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1376,
+        96
+      ],
+      "id": "9217744a-8d37-4932-960b-fc2bf25f9fd6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "channel",
+        "operation": "get",
+        "channelId": {
+          "__rl": true,
+          "value": "C0CK5DQVA76",
+          "mode": "list",
+          "cachedResultName": "n8n-coderhouseaitesting"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        1584,
+        96
+      ],
+      "id": "fd47e02c-6469-4e4c-89f7-ed6f4581fcb2",
+      "name": "Get a channel",
+      "webhookId": "fd311173-7230-49de-b3ef-0bc1a1485b6b",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "n9rRzIDtJylyeW5x",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inquiry Classifier Agent": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Inquiry Classifier Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save_classified_inquiry": {
+      "ai_tool": [
+        [
+          {
+            "node": "Inquiry Classifier Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Execution Summary": {
+      "main": [
+        [
+          {
+            "node": "Send Task Completed Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Task Completed Email": {
+      "main": [
+        [
+          {
+            "node": "Chat Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Worker_Analisis'": {
+      "main": [
+        [
+          {
+            "node": "Log Execution Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Inquiry Classifier Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get a channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a channel": {
+      "main": [
+        [
+          {
+            "node": "Call 'Worker_Analisis'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5c16385a-25fc-45c4-82cf-04fe65734463",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e9d17abf6e85493e4ed19865665193051c141fb6fb9fd08e0a360aaf27fb32fb"
+  },
+  "nodeGroups": [],
+  "id": "va2YiGKMI9z1gxQ3",
+  "tags": []
+}
