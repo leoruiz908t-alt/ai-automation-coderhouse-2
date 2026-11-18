@@ -1,0 +1,362 @@
+{
+  "name": "Inquiry Classification Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "id": "18240155-fd43-45cb-9a72-5f641cecb708",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        112
+      ],
+      "webhookId": "4d59973e-4882-4822-b16d-2e8ad36d8402"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "ROLE:\nYou are a business inquiry classification assistant.\n\nSCOPE:\nAnalyze user messages and classify them.\n\nOBJECTIVE:\nClassify every inquiry into one of these categories:\n- Sales\n- Support\n- Billing\n\nRULES:\n- Use available tools when necessary.\n- Do not invent information.\n- If the request cannot be classified, respond with:\n\"Human review required\".\n\nESCALATION:\nIf classification confidence is low, return:\n\"Human review required\".\n\nRESTRICTIONS:\n- Do not provide legal advice.\n- Do not provide financial advice.\n- Do not modify existing records.",
+          "maxIterations": 5,
+          "returnIntermediateSteps": true,
+          "tracingMetadata": {
+            "values": [
+              {
+                "key": "workflow",
+                "stringValue": "Inquiry Classification Agent"
+              },
+              {
+                "key": "purpose",
+                "stringValue": "inquiry-classification"
+              }
+            ]
+          }
+        }
+      },
+      "id": "b3b9a6a8-56b5-4550-a40b-ea803e2dab23",
+      "name": "Inquiry Classifier Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-6-luna",
+          "cachedResultName": "gpt-6-luna"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "688fe798-ddfd-401f-93dd-bbc4629734e3",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        336
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "Gateway credits",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool only when an inquiry has been successfully classified.\n\nStore:\n- Date\n- User inquiry\n- Classification category\n\nDo not use this tool when information is insufficient or when human review is required.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps",
+          "mode": "list",
+          "cachedResultName": "N8N - Entrega  1 - Inquiry Classifications",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja 2",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "DATE": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('DATE', ``, 'string') }}",
+            "User Inquiry": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('User_Inquiry', ``, 'string') }}",
+            "Category": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Category', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "DATE",
+              "displayName": "DATE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "User Inquiry",
+              "displayName": "User Inquiry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Columna 4",
+              "displayName": "Columna 4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Columna 5",
+              "displayName": "Columna 5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Columna 6",
+              "displayName": "Columna 6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "7eccbcfa-9963-44d4-a755-4aa821e368ed",
+      "name": "save_classified_inquiry",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        368,
+        336
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "w4rTT9mL1PKy5vj6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "timestamp",
+              "type": "string",
+              "value": "={{ $now.toISO() }}"
+            },
+            {
+              "id": "a2",
+              "name": "executionId",
+              "type": "string",
+              "value": "={{ $execution.id }}"
+            },
+            {
+              "id": "a3",
+              "name": "workflowName",
+              "type": "string",
+              "value": "={{ $workflow.name }}"
+            },
+            {
+              "id": "a4",
+              "name": "inquiry",
+              "type": "string",
+              "value": "={{ $('Chat Trigger').item.json.chatInput }}"
+            },
+            {
+              "id": "a5",
+              "name": "classification",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "id": "a6",
+              "name": "status",
+              "type": "string",
+              "value": "={{ $json.output.includes('Human review required') ? 'escalated' : 'classified' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8e70d6a7-acd5-48a9-af18-810f0a38c523",
+      "name": "Log Execution Summary",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        576,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "cursitosleo@gmail.com",
+        "subject": "Reporte de Clasificación de Consulta",
+        "emailType": "text",
+        "message": "=Se procesó una nueva consulta mediante el agente de clasificación.\n\nConsulta:\n{{ $json.inquiry }}\n\nCategoría asignada:\n{{ $json.classification }}\n\nEstado:\n{{ $json.status }}\n\nFecha y hora:\n{{ $json.timestamp }}\n\nID de ejecución:\n{{ $json.executionId }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "121eb1bf-314c-48cc-8f98-c26a981df506",
+      "name": "Send Task Completed Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        112
+      ],
+      "webhookId": "71abac98-e841-4af1-94ac-ddbb669a4fdc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "i2X0w2LDF8dtu8sh",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "output",
+              "type": "string",
+              "value": "={{ $('Log Execution Summary').item.json.classification }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0cb03deb-b2ce-45a0-bab0-73fdf74c1bad",
+      "name": "Chat Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1024,
+        112
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "Inquiry Classifier Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inquiry Classifier Agent": {
+      "main": [
+        [
+          {
+            "node": "Log Execution Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Inquiry Classifier Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save_classified_inquiry": {
+      "ai_tool": [
+        [
+          {
+            "node": "Inquiry Classifier Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Execution Summary": {
+      "main": [
+        [
+          {
+            "node": "Send Task Completed Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Task Completed Email": {
+      "main": [
+        [
+          {
+            "node": "Chat Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "441010a5-22f0-41a5-9212-5ee4d30994da",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e9d17abf6e85493e4ed19865665193051c141fb6fb9fd08e0a360aaf27fb32fb"
+  },
+  "nodeGroups": [],
+  "id": "pKHnuCuDPB1twJ50",
+  "tags": []
+}
