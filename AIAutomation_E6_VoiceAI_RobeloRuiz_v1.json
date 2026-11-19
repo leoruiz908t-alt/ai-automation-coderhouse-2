@@ -1,0 +1,891 @@
+{
+  "name": "AIAutomation_Modulo6_VoiceAI_LeoR",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "VOICE AI RULES:\n\nRespond always in Spanish.\n\nMaximum 200 characters per response.\n\nDo not use emojis.\n\nDo not use links.\n\nDo not use bullet points or lists.\n\nResponses must be short and natural for voice synthesis.\nDo not use links.\n\nDo not use bullet points or lists.\n\n\nROLE:\nYou are a business inquiry classification assistant.\n\nSCOPE:\nAnalyze user messages and classify them.\n\nOBJECTIVE:\nClassify every inquiry into one of these categories:\n- Sales\n- Support\n- Billing\n\nRULES:\n- Use available tools when necessary.\n- Do not invent information.\n- If the request cannot be classified, respond with:\n\"Human review required\".\n\nESCALATION:\nIf classification confidence is low, return:\n\"Human review required\".\n\nRESTRICTIONS:\n- Do not provide legal advice.\n- Do not provide financial advice.\n- Do not modify existing records.\n[INICIO DE CONTEXTO COMPARTIDO]\n\nSession ID:\n{{ $json.sessionId }}\n\nResumen previo:\n{{ $json.Resumen_Consolidado }}\n\nEstado del caso:\n{{ $json.Estado_Caso }}\n\n[FIN DEL CONTEXTO COMPARTIDO]\n\nUtiliza esta información únicamente como contexto.\nREGLAS RAG:\n\n- Utiliza únicamente la información recuperada desde la documentación indexada.\n- Cita siempre la fuente utilizada.\n- Si la información no se encuentra en los documentos recuperados, responde exactamente:\n\n\"No sé\"\n\n- No inventes respuestas.\n",
+          "maxIterations": 5,
+          "returnIntermediateSteps": true,
+          "tracingMetadata": {
+            "values": [
+              {
+                "key": "workflow",
+                "stringValue": "Inquiry Classification Agent"
+              },
+              {
+                "key": "purpose",
+                "stringValue": "inquiry-classification"
+              }
+            ]
+          }
+        }
+      },
+      "id": "877646d4-01b3-4fb7-9a95-6f4b679d44f4",
+      "name": "Inquiry Classifier Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1120,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-6-luna",
+          "cachedResultName": "gpt-6-luna"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "1c4f6294-5447-4f00-a6fb-a897a732b81e",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1232,
+        336
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "Gateway credits",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool only when an inquiry has been successfully classified.\n\nStore:\n- Date\n- User inquiry\n- Classification category\n\nDo not use this tool when information is insufficient or when human review is required.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps",
+          "mode": "list",
+          "cachedResultName": "N8N - Entrega  1 - Inquiry Classifications",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja 2",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "DATE": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('DATE', ``, 'string') }}",
+            "User Inquiry": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('User_Inquiry', ``, 'string') }}",
+            "Category": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Category', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "DATE",
+              "displayName": "DATE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "User Inquiry",
+              "displayName": "User Inquiry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Columna 4",
+              "displayName": "Columna 4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Columna 5",
+              "displayName": "Columna 5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Columna 6",
+              "displayName": "Columna 6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "866175cd-2e28-479f-b13c-f189eec98904",
+      "name": "save_classified_inquiry",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1552,
+        352
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "w4rTT9mL1PKy5vj6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "timestamp",
+              "type": "string",
+              "value": "={{ $now.toISO() }}"
+            },
+            {
+              "id": "a2",
+              "name": "executionId",
+              "type": "string",
+              "value": "={{ $execution.id }}"
+            },
+            {
+              "id": "a3",
+              "name": "workflowName",
+              "type": "string",
+              "value": "={{ $workflow.name }}"
+            },
+            {
+              "id": "a4",
+              "name": "inquiry",
+              "type": "string",
+              "value": "={{ $('Chat Trigger').item.json.chatInput }}"
+            },
+            {
+              "id": "a5",
+              "name": "classification",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "id": "a6",
+              "name": "status",
+              "type": "string",
+              "value": "={{ $json.output.includes('Human review required') ? 'escalated' : 'classified' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0589c313-d566-441e-bef0-771951af3667",
+      "name": "Log Execution Summary",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2608,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "cursitosleo@gmail.com",
+        "subject": "Reporte de Clasificación de Consulta",
+        "emailType": "text",
+        "message": "=Se procesó una nueva consulta mediante el agente de clasificación.\n\nConsulta:\n{{ $json.inquiry }}\n\nCategoría asignada:\n{{ $json.classification }}\n\nEstado:\n{{ $json.status }}\n\nFecha y hora:\n{{ $json.timestamp }}\n\nID de ejecución:\n{{ $json.executionId }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "0a276518-5d4c-4fe0-9add-a135b64cd6ac",
+      "name": "Send Task Completed Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2784,
+        96
+      ],
+      "webhookId": "0a6da610-fe30-4658-826c-db40b2322d32",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "i2X0w2LDF8dtu8sh",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "output",
+              "type": "string",
+              "value": "={{ $('Log Execution Summary').item.json.classification }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "83a30f49-caab-47c4-a339-fda072abff42",
+      "name": "Chat Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2960,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "1KJ3smaKdfB86vZY",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/1KJ3smaKdfB86vZY",
+          "cachedResultName": "Worker_Analisis"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Consulta": "Analizar solicitud de cliente"
+          },
+          "matchingColumns": [
+            "Consulta"
+          ],
+          "schema": [
+            {
+              "id": "Consulta",
+              "displayName": "Consulta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        2416,
+        96
+      ],
+      "id": "91246f79-570a-401c-85b6-ceddd4348069",
+      "name": "Call 'Worker_Analisis'"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps",
+          "mode": "list",
+          "cachedResultName": "N8N - Entrega  1 - Inquiry Classifications",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1787110843,
+          "mode": "list",
+          "cachedResultName": "memoria_agente",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps/edit#gid=1787110843"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Session_ID",
+              "lookupValue": "={{$json.sessionId}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        688,
+        112
+      ],
+      "id": "63ae6381-574b-4a9e-beb2-1fb626e6d9a8",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "w4rTT9mL1PKy5vj6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "91b2765f-dfb1-42e8-9cae-85fd6610bc4b",
+              "leftValue": "={{$json.Session_ID}}",
+              "rightValue": "\"\"",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        864,
+        112
+      ],
+      "id": "1d0587af-64c0-4760-a571-0553d697c6ff",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps",
+          "mode": "list",
+          "cachedResultName": "N8N - Entrega  1 - Inquiry Classifications",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1787110843,
+          "mode": "list",
+          "cachedResultName": "memoria_agente",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mJUG86QRuMdwQiVDWhIQHEnaet4jv9TBufia-fkTQps/edit#gid=1787110843"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Session_ID": "={{$json.sessionId}}"
+          },
+          "matchingColumns": [
+            "Session_ID"
+          ],
+          "schema": [
+            {
+              "id": "Session_ID",
+              "displayName": "Session_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1008,
+        272
+      ],
+      "id": "91e06571-12a1-4859-8cdd-04a924f7f53e",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "w4rTT9mL1PKy5vj6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "Analiza la conversación y responde únicamente con JSON válido.\n\n{\n  \"asunto_principal\": \"string\",\n  \"puntos_clave\": [\n    \"string\"\n  ],\n  \"accion_requerida\": \"string\"\n}\n\nNo agregues explicaciones.\nNo agregues texto fuera del JSON.\nDevuelve únicamente JSON válido.\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        1408,
+        96
+      ],
+      "id": "ce8e0f74-8f87-4801-a1f3-7ee479a5fe13",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "fb20d791-5932-4abf-8dc7-d48f2f51c90d",
+              "leftValue": "={{$json.chatInput}}",
+              "rightValue": "=Auto-reply",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        448,
+        112
+      ],
+      "id": "c3342994-6840-424e-aba0-928a5e096f4a",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f630c857-d236-4a1a-828b-a97c8792f768",
+              "name": "from",
+              "value": "={{$json.from}}",
+              "type": "string"
+            },
+            {
+              "id": "9389354f-eac6-4e86-94f9-bfdb3d5eb5ef",
+              "name": "Subject",
+              "value": "={{$json.subject}}",
+              "type": "string"
+            },
+            {
+              "id": "b3875888-3914-45bb-936e-99a52a9bb9c1",
+              "name": "BodyText",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2064,
+        96
+      ],
+      "id": "7f0ffa4b-dfd6-4beb-aa16-06720060e5d8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "channel",
+        "operation": "get",
+        "channelId": {
+          "__rl": true,
+          "value": "C0CK5DQVA76",
+          "mode": "list",
+          "cachedResultName": "n8n-coderhouseaitesting"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        2224,
+        96
+      ],
+      "id": "e284d77c-f2c1-4467-9742-ae2e98197b93",
+      "name": "Get a channel",
+      "webhookId": "3e6c6a52-73a7-42a2-b085-89d5079d7f7c",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "n9rRzIDtJylyeW5x",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@llamaindex/n8n-nodes-llamacloud.llamaParsePlatformTool",
+      "typeVersion": 1,
+      "position": [
+        1392,
+        416
+      ],
+      "id": "a790d24f-e6d5-4dfc-9576-13fa43e34675",
+      "name": "LlamaParse Platform",
+      "credentials": {
+        "llamaParseApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "6297f2af-1099-4945-9f6b-57f46aebb132",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        112
+      ],
+      "id": "f4b79fde-7bfc-409f-a7d2-182eaf2967e6",
+      "name": "Webhook",
+      "webhookId": "6297f2af-1099-4945-9f6b-57f46aebb132"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "es"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        272,
+        112
+      ],
+      "id": "64ff14ee-bec2-4749-a36c-59630b215594",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "speech",
+        "voice": {
+          "__rl": true,
+          "value": "N2lVS1w4EtoT3dr4eOWO",
+          "mode": "list",
+          "cachedResultName": "Callum - Husky Trickster"
+        },
+        "text": "={{$json.text}}",
+        "additionalOptions": {
+          "model": {
+            "mode": "list",
+            "value": "eleven_multilingual_v2"
+          },
+          "voiceSettings": "{\n  \"stability\": 1,\n  \"similarity_boost\": 1,\n  \"style\": 0,\n  \"use_speaker_boost\": true,\n  \"speed\": 1\n}"
+        },
+        "requestOptions": {}
+      },
+      "type": "@elevenlabs/n8n-nodes-elevenlabs.elevenLabs",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        96
+      ],
+      "id": "4a123eeb-09c0-4116-b433-34ce76e006f6",
+      "name": "Convert text to speech",
+      "credentials": {
+        "elevenLabsApi": {
+          "id": "zMGJtYI5XAuaZnDf",
+          "name": "ElevenLabs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1888,
+        96
+      ],
+      "id": "bfc73fcc-516f-4a97-baef-5b5753cf23a5",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Inquiry Classifier Agent": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Inquiry Classifier Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save_classified_inquiry": {
+      "ai_tool": [
+        [
+          {
+            "node": "Inquiry Classifier Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Execution Summary": {
+      "main": [
+        [
+          {
+            "node": "Send Task Completed Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Task Completed Email": {
+      "main": [
+        [
+          {
+            "node": "Chat Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Worker_Analisis'": {
+      "main": [
+        [
+          {
+            "node": "Log Execution Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Inquiry Classifier Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Convert text to speech",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get a channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a channel": {
+      "main": [
+        [
+          {
+            "node": "Call 'Worker_Analisis'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LlamaParse Platform": {
+      "ai_tool": [
+        [
+          {
+            "node": "Inquiry Classifier Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert text to speech": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataErrorExecution": "none",
+    "saveDataSuccessExecution": "none",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "229ac64a-9675-4d68-8724-ca9525824110",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e9d17abf6e85493e4ed19865665193051c141fb6fb9fd08e0a360aaf27fb32fb"
+  },
+  "nodeGroups": [],
+  "id": "xOswkEcCz4o0KZXc",
+  "tags": []
+}
